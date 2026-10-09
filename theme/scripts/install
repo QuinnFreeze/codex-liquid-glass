@@ -1,0 +1,22 @@
+#!/bin/zsh
+set -eu
+ROOT="${0:A:h:h}"
+if [[ "${1:-}" != "--preview" ]]; then
+ exec python3 "$ROOT/scripts/autostart-install.py"
+fi
+NODE_BIN="$(command -v node 2>/dev/null || true)"
+[[ -n "$NODE_BIN" ]] || NODE_BIN="/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node"
+python3 "$ROOT/scripts/backup.py"
+"$NODE_BIN" --check "$ROOT/scripts/runtime.mjs"
+"$NODE_BIN" --input-type=module -e 'import(process.argv[1]).then(m=>m.build())' "$ROOT/scripts/build.mjs"
+python3 - "$ROOT" <<'PY'
+import pathlib,sys,json,shlex,os
+r=pathlib.Path(sys.argv[1]);p=r/'Launch Liquid Glass.command'
+p.write_text('#!/bin/zsh\nexec '+shlex.quote(str(r/'scripts/launch'))+'\n');p.chmod(0o755)
+(r/'state/install.json').write_text(json.dumps({'installed':True,'app':'/Applications/ChatGPT.app','signedFilesChanged':False}))
+PY
+if [[ "${1:-}" == "--preview" ]]; then
+ "$ROOT/scripts/reapply" "${2:-9236}"
+else
+ print '已安装启动器。完成当前聊天后退出 ChatGPT，再运行 Launch Liquid Glass.command。应用签名和文件均未修改。'
+fi

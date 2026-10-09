@@ -1,0 +1,13 @@
+{
+  "wallpaper": "wallpaper/current.jpg",
+  "position": "60% 42%",
+  "mainAlpha": 0.08,
+  "sidebarAlpha": 0.72,
+  "sidebarBlur": 4,
+  "floatingAlpha": 0.86,
+  "floatingBlur": 7,
+  "messageAlpha": 0.9,
+  "refraction": false,
+  "scrimAlpha": 0.22,
+  "activityAlpha": 0.78
+}

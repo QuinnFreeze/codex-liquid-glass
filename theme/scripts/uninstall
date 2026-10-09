@@ -1,0 +1,22 @@
+#!/bin/zsh
+set -eu
+ROOT="${0:A:h:h}"
+TARGET_ROOT="$(python3 "$ROOT/scripts/installed-root.py")"
+if [[ "$TARGET_ROOT" != "$ROOT" ]]; then
+ exec "$TARGET_ROOT/scripts/uninstall" "$@"
+fi
+if [[ -f "$ROOT/autostart.json" ]]; then
+ exec python3 "$ROOT/scripts/autostart-uninstall.py"
+fi
+if [[ "${WYNN_THEME_OPERATION_LOCKED:-}" != "1" ]]; then
+ exec python3 "$ROOT/scripts/lock.py" "$0" "$@"
+fi
+NODE_BIN="$(command -v node 2>/dev/null || true)"
+[[ -n "$NODE_BIN" ]] || NODE_BIN="/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node"
+python3 "$ROOT/scripts/backup.py"
+python3 "$ROOT/scripts/stop.py" "$ROOT" "$NODE_BIN"
+python3 - "$ROOT" <<'PY'
+import pathlib,sys
+r=pathlib.Path(sys.argv[1]);(r/'Launch Liquid Glass.command').unlink(missing_ok=True);(r/'state/install.json').unlink(missing_ok=True)
+PY
+print '主题已移除，原始应用文件未改动。退出主题窗口后正常打开 ChatGPT，可同时关闭本地调试端口。备份和原图仍保留。'

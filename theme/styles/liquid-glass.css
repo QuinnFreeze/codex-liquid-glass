@@ -1,0 +1,68 @@
+/* Background optics only; text and controls retain native colors and opacity. */
+:root[data-wynn-glass="on"] {
+ --wynn-rgb: 255 255 255;
+ --wynn-ink: 25 28 32;
+ --wynn-muted: 82 89 98;
+ --wynn-edge: rgb(255 255 255 / .68);
+ --wynn-outline: rgb(var(--wynn-ink) / .12);
+ --wynn-shadow: 0 8px 28px rgb(20 23 28 / .09);
+ --wynn-focus-alpha: .95;
+ --wynn-effective-blur: var(--wynn-floating-blur);
+}
+:root[data-wynn-glass="on"][data-theme="dark"] {
+ --wynn-rgb: 28 30 33;
+ --wynn-ink: 245 245 247;
+ --wynn-muted: 198 203 211;
+ --wynn-edge: rgb(255 255 255 / .16);
+ --wynn-outline: rgb(255 255 255 / .17);
+ --wynn-shadow: 0 8px 28px rgb(0 0 0 / .24);
+ --wynn-main-alpha: .66;
+ --wynn-sidebar-alpha: .9;
+ --wynn-message-alpha: .94;
+ --wynn-activity-alpha: .86;
+ --wynn-floating-alpha: .94;
+ --wynn-focus-alpha: .98;
+}
+/* One glass surface at the native ComposerLayoutRoot, including its controls.
+   Painting the body alone samples the opaque parent instead of the wallpaper. */
+:root[data-wynn-glass="on"] :is([data-composer-surface-variant="default"],[role="menu"],[role="dialog"],[role="tooltip"],[data-radix-popper-content-wrapper]>div) {
+ background: rgb(var(--wynn-rgb) / var(--wynn-floating-alpha)) !important;
+ border: 1px solid var(--wynn-outline) !important;
+ box-shadow: inset 0 1px 0 var(--wynn-edge),var(--wynn-shadow) !important;
+ backdrop-filter: blur(var(--wynn-effective-blur)) saturate(1.04) !important;
+ -webkit-backdrop-filter: blur(var(--wynn-effective-blur)) saturate(1.04) !important;
+}
+:root[data-wynn-glass="on"] [data-composer-surface-variant="default"] {
+ transition: background-color 180ms ease,box-shadow 180ms ease;
+}
+/* Home composers round the inner body only. The glass is painted on the
+   outer surface, so give that surface the same native default 22px radius. */
+:root[data-wynn-glass="on"] [data-composer-surface-variant="default"][data-composer-radius-variant="default"] {
+ border-radius: 22px !important;
+}
+:root[data-wynn-glass="on"] [data-composer-surface-variant="default"] > [data-composer-body] {
+ background: transparent !important;
+ border: 0 !important;
+ box-shadow: none !important;
+ backdrop-filter: none !important;
+ -webkit-backdrop-filter: none !important;
+}
+:root[data-wynn-glass="on"] [data-composer-surface-variant="default"]:focus-within {
+ background: rgb(var(--wynn-rgb) / var(--wynn-focus-alpha)) !important;
+ box-shadow: inset 0 1px 0 var(--wynn-edge),0 0 0 2px rgb(var(--wynn-ink) / .18),var(--wynn-shadow) !important;
+}
+:root[data-wynn-glass="on"][data-wynn-refraction="on"] :is([role="menu"],[role="tooltip"]) {
+ backdrop-filter: url("#wynn-edge-lens") blur(var(--wynn-effective-blur)) saturate(1.04) !important;
+ -webkit-backdrop-filter: url("#wynn-edge-lens") blur(var(--wynn-effective-blur)) saturate(1.04) !important;
+}
+:root[data-wynn-glass="on"] :is([role="dialog"],[role="menu"],[role="tooltip"]) {border-radius: 14px}
+:root[data-wynn-glass="on"] button[class*="_Button_"] {
+ transition: background-color 160ms ease,box-shadow 160ms ease;
+}
+:root[data-wynn-glass="on"] button[class*="_Button_"][data-color="secondary"][data-variant="ghost"]:not(:disabled):not([aria-disabled="true"]):hover {
+ background: rgb(var(--wynn-ink) / .07);
+}
+:root[data-wynn-glass="on"] :is(button,[role="button"]):focus-visible {
+ outline: 2px solid rgb(var(--wynn-ink) / .65);
+ outline-offset: 2px;
+}

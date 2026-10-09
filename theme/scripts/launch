@@ -1,0 +1,31 @@
+#!/bin/zsh
+set -eu
+ROOT="${0:A:h:h}"
+TARGET_ROOT="$(python3 "$ROOT/scripts/installed-root.py")"
+if [[ "$TARGET_ROOT" != "$ROOT" ]]; then
+ exec "$TARGET_ROOT/scripts/launch" "$@"
+fi
+if [[ -f "$ROOT/autostart.json" ]]; then
+ exec python3 "$ROOT/scripts/auto-launch.py" "$@"
+fi
+NODE_BIN="$(command -v node 2>/dev/null || true)"
+[[ -n "$NODE_BIN" ]] || NODE_BIN="/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node"
+PORT=9236
+if /usr/bin/curl -fsS --max-time 1 "http://127.0.0.1:$PORT/json/version" >/dev/null 2>&1; then
+ "$ROOT/scripts/reapply" "$PORT"
+ exit 0
+fi
+if /usr/bin/pgrep -f '^/Applications/ChatGPT.app/Contents/MacOS/ChatGPT$' >/dev/null; then
+ print '请在当前聊天完成后退出 ChatGPT，再运行此启动器。运行中窗口不能追加调试参数；脚本不会强制终止聊天。'
+ exit 1
+fi
+/usr/bin/open /Applications/ChatGPT.app --args --remote-debugging-address=127.0.0.1 --remote-debugging-port="$PORT"
+for i in {1..100}; do
+ if /usr/bin/curl -fsS --max-time 1 "http://127.0.0.1:$PORT/json/version" >/dev/null 2>&1; then
+  "$ROOT/scripts/reapply" "$PORT"
+  exit 0
+ fi
+ /bin/sleep .2
+done
+print 'Codex 调试端口未就绪。应用更新可能改变了兼容性；未修改应用包。'
+exit 1

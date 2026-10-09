@@ -1,0 +1,22 @@
+reference/
+evidence/
+before.png
+theme/state/
+**/__pycache__/
+**/*.pyc
+.DS_Store
+
+# Local history, reports, and machine-specific recovery commands.
+/local-only/
+/*.command
+/优化说明.md
+/综合测试与修复报告.md
+/主题加载性能与综合测试-*.md
+
+# Generated installation and runtime artifacts.
+theme/bin/
+theme/backups/
+theme/evidence/
+theme/autostart.json
+theme/Launch Liquid Glass.command
+theme/styles/compiled.css

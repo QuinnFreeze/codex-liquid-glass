@@ -1,0 +1,46 @@
+#!/bin/zsh
+set -eu
+ROOT="${0:A:h:h}"
+TARGET_ROOT="$(python3 "$ROOT/scripts/installed-root.py")"
+if [[ "$TARGET_ROOT" != "$ROOT" ]]; then
+ exec "$TARGET_ROOT/scripts/reapply" "$@"
+fi
+if [[ "${WYNN_THEME_OPERATION_LOCKED:-}" != "1" ]]; then
+ exec python3 "$ROOT/scripts/lock.py" "$0" "$@"
+fi
+NODE_BIN="$(command -v node 2>/dev/null || true)"
+[[ -n "$NODE_BIN" ]] || NODE_BIN="/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node"
+PORT="${1:-9236}"
+if [[ $# -gt 2 || ( $# -eq 2 && "$2" != "--attach" ) ]]; then
+ print -u2 'usage: reapply [port] [--attach]'
+ exit 2
+fi
+# Automatic attachment does not change theme configuration or the app bundle.
+# Keep the full application hash/backup for explicit maintenance, off the
+# normal launch and crash-recovery path. Validate before removing old hooks.
+if [[ "${2:-}" != "--attach" ]]; then
+ python3 "$ROOT/scripts/backup.py"
+fi
+"$NODE_BIN" --check "$ROOT/scripts/runtime.mjs"
+"$NODE_BIN" --input-type=module -e 'import(process.argv[1]).then(m=>m.build())' "$ROOT/scripts/build.mjs"
+python3 "$ROOT/scripts/stop.py" "$ROOT" "$NODE_BIN" "$PORT"
+python3 - "$ROOT" "$PORT" "$NODE_BIN" <<'PY'
+import subprocess,pathlib,sys,time,json,socket
+r=pathlib.Path(sys.argv[1]);port=sys.argv[2];f=(r/'state/runtime.log').open('ab')
+p=subprocess.Popen([sys.argv[3],str(r/'scripts/runtime.mjs'),'daemon',port],stdout=f,stderr=f,start_new_session=True)
+for i in range(1200):
+ if p.poll() is not None:raise SystemExit('主题服务未启动；请先使用主题启动器启动应用。查看 state/runtime.log。')
+ try:
+  with socket.socket(socket.AF_UNIX) as s:
+   s.settimeout(1);s.connect(str(r/'state/control.sock'));s.sendall(b'status');result=json.loads(s.recv(8192))
+  if result.get('browserDead'):
+   p.terminate()
+   raise SystemExit('Codex 调试连接已关闭。')
+  if result.get('shellSessions',0)>0:
+   print(json.dumps(result));break
+  time.sleep(.1)
+ except OSError:time.sleep(.1)
+else:
+ p.terminate()
+ raise SystemExit('没有成功注入兼容的 Codex 窗口；请查看 state/runtime.log。')
+PY

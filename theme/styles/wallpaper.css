@@ -1,0 +1,10 @@
+/* The original image is embedded unchanged; scrims are separate CSS surfaces. */
+:root[data-wynn-glass="on"][data-codex-window-type="electron"] body {
+ background-color: rgb(var(--wynn-rgb)) !important;
+ background-image: var(--wynn-wallpaper) !important;
+ background-size: cover !important;
+ background-position: var(--wynn-position,60% 42%) !important;
+ background-repeat: no-repeat !important;
+ background-attachment: fixed !important;
+}
+:root[data-wynn-glass="on"][data-codex-window-type="electron"] #root {background: transparent !important}

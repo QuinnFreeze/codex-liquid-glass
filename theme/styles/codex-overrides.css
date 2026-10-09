@@ -1,0 +1,178 @@
+/* Checked against the installed 26.930 shell. Native data attributes first. */
+:root[data-wynn-glass="on"][data-codex-window-type="electron"] {
+ --app-shell-sidebar-popover-background: rgb(var(--wynn-rgb) / .98);
+ --tooltip-background-color: rgb(var(--wynn-rgb) / .98);
+ --tooltip-text-color: rgb(var(--wynn-ink));
+ --tooltip-compact-background-color: rgb(var(--wynn-rgb) / .98);
+ --tooltip-compact-text-color: rgb(var(--wynn-ink));
+ --tooltip-compact-interactive-background-color-hover: rgb(var(--wynn-rgb) / .98);
+ --tooltip-compact-interactive-text-color-hover: rgb(var(--wynn-ink));
+ /* The current tooltip and its shortcut use these tokens, not the legacy
+    --tooltip-text-color. Keep their ink paired with the glass background. */
+ --color-background-tooltip: rgb(var(--wynn-rgb) / .98);
+ --color-text-tooltip: rgb(var(--wynn-ink));
+ --color-background-tooltip-shortcut: rgb(var(--wynn-ink) / .1);
+ --color-text-tooltip-shortcut: rgb(var(--wynn-ink));
+ --color-background-tooltip-classic: rgb(var(--wynn-rgb) / .98);
+ --color-text-tooltip-classic: rgb(var(--wynn-ink));
+ --color-token-dropdown-background: rgb(var(--wynn-rgb) / .98);
+ --color-background-composer-action-bar: transparent;
+}
+:root[data-wynn-glass="on"] :is([data-app-shell-frame],[data-app-shell-page-surface]) {background: transparent !important}
+/* Keep the docked panels and navigation rail flush with the window edge;
+   the composer has its own breathing room below. */
+:root[data-wynn-glass="on"][data-codex-window-type="electron"] [data-app-shell-frame][data-app-shell-page-surface="true"] {
+ padding-bottom: 0 !important;
+}
+:root[data-wynn-glass="on"][data-codex-window-type="electron"] .app-shell-left-panel [data-app-navigation-rail] {
+ padding-bottom: 0 !important;
+}
+/* A directional reading scrim softens dense line art without editing the image. */
+:root[data-wynn-glass="on"] [data-app-shell-main-surface] {
+ --thread-composer-bottom-inset: 24px;
+ background: linear-gradient(90deg,rgb(var(--wynn-rgb) / var(--wynn-scrim-alpha)),transparent 85%),rgb(var(--wynn-rgb) / var(--wynn-main-alpha)) !important;
+ border-left: 0 !important;
+ border-inline-start: 0 !important;
+ box-shadow: none !important;
+ --color-text-secondary: rgb(var(--wynn-muted));
+ --color-text-tertiary: rgb(var(--wynn-muted));
+}
+/* The home footer already supplies 16px. Add 8px to match the thread's
+   24px gap without moving overlays or detaching the composer from layout. */
+:root[data-wynn-glass="on"] [data-codex-composer-root][data-composer-placement="home"] {
+ padding-bottom: 8px;
+}
+:root[data-wynn-glass="on"] .app-shell-left-panel {
+ background: linear-gradient(180deg,rgb(var(--wynn-rgb) / .18),transparent 65%),rgb(var(--wynn-rgb) / var(--wynn-sidebar-alpha)) !important;
+ backdrop-filter: none !important;
+ -webkit-backdrop-filter: none !important;
+ border-right: 0 !important;
+ border-inline-end: 0 !important;
+ border-radius: 18px 0 0 18px;
+ --color-text-secondary: rgb(var(--wynn-muted));
+ --color-text-tertiary: rgb(var(--wynn-muted));
+ --app-color-text-foreground-secondary: rgb(var(--wynn-muted));
+}
+/* Docked sidebar and chat share one continuous reading wash. Separate alpha
+   layers and the native 20px sidebar extension otherwise create a visible seam
+   even with zero borders. The native width variable follows sidebar resizing. */
+:root[data-wynn-glass="on"] [data-app-shell-responsive-sidebar="false"][data-app-shell-sidebar-open="true"][data-app-shell-page-sidebar="true"] > [data-app-shell-workspace-row] {
+ background: linear-gradient(90deg,
+  rgb(var(--wynn-rgb) / var(--wynn-sidebar-alpha)) 0,
+  rgb(var(--wynn-rgb) / var(--wynn-sidebar-alpha)) max(0px,calc(var(--codex-sidebar-preferred-width,340px) - 56px)),
+  rgb(var(--wynn-rgb) / calc(var(--wynn-main-alpha) + var(--wynn-scrim-alpha) * (1 - var(--wynn-main-alpha)))) calc(var(--codex-sidebar-preferred-width,340px) + 88px),
+  rgb(var(--wynn-rgb) / var(--wynn-main-alpha)) 100%) !important;
+}
+:root[data-wynn-glass="on"] [data-app-shell-responsive-sidebar="false"][data-app-shell-sidebar-open="true"][data-app-shell-page-sidebar="true"] > [data-app-shell-workspace-row] :is(.app-shell-left-panel,[data-app-shell-main-surface]) {
+ background: transparent !important;
+}
+:root[data-wynn-glass="on"] [data-app-shell-responsive-sidebar="false"][data-app-shell-sidebar-open="true"][data-app-shell-page-sidebar="true"] > [data-app-shell-workspace-row] > .app-shell-left-panel::after {
+ content: none !important;
+ background: transparent !important;
+}
+/* Keep the native scrollbar and resize hit target; only hide the divider paint. */
+:root[data-wynn-glass="on"] .app-shell-left-panel .sidebar-resize-handle-line {
+ background: transparent !important;
+}
+:root[data-wynn-glass="on"] [data-app-shell-titlebar] {
+ background: rgb(var(--wynn-rgb) / var(--wynn-sidebar-alpha)) !important;
+ backdrop-filter: none !important;
+ -webkit-backdrop-filter: none !important;
+ box-shadow: none !important;
+ --color-text-tertiary: rgb(var(--wynn-muted));
+}
+:root[data-wynn-glass="on"] [data-app-shell-main-content-top-fade]::before,
+:root[data-wynn-glass="on"] [data-app-shell-main-content-top-fade] > [class*="_MainContentTopFade_"],
+/* The 26.930 footer uses a Tailwind bg-surface scrim instead of _background_.
+   Clear only its noninteractive paint layer, not the composer or buttons. */
+:root[data-wynn-glass="on"] [data-thread-scroll-footer] > :is([class*="_background_"],[class~="pointer-events-none"][class~="absolute"][class~="bg-surface"]) {
+ background: transparent !important;
+ background-image: none !important;
+}
+/* A separate sticky spacer owns the native 32px bottom fade. After the footer
+   becomes transparent, its opaque endpoint leaves a horizontal seam. */
+:root[data-wynn-glass="on"] .thread-scroll-container [class~="sticky"][class~="bottom-0"][class~="pointer-events-none"] > [class~="bg-gradient-to-t"][class~="from-surface"] {
+ background: transparent !important;
+ background-image: none !important;
+}
+:root[data-wynn-glass="on"] .app-shell-left-panel :is([aria-current="page"],[aria-selected="true"],[data-selected="true"],[data-app-action-sidebar-thread-selected="true"]) {
+ background: rgb(var(--wynn-ink) / .09) !important;
+ box-shadow: inset 3px 0 0 rgb(var(--wynn-ink) / .55),inset 0 1px 0 var(--wynn-edge);
+ border-radius: 9px;
+}
+:root[data-wynn-glass="on"] .app-shell-left-panel .sidebar-item:not(:disabled):not([aria-disabled="true"]):hover {
+ background: rgb(var(--wynn-ink) / .06);
+ border-radius: 9px;
+}
+/* One reading sheet per native Markdown root, no nested paint or backdrop blur. */
+:root[data-wynn-glass="on"] :is(.markdown,[data-markdown-text-style]) {
+ background: rgb(var(--wynn-rgb) / var(--wynn-message-alpha));
+ border-radius: 14px;
+ padding: 12px 16px;
+ box-shadow: inset 0 1px 0 var(--wynn-edge);
+ overflow-wrap: anywhere;
+}
+:root[data-wynn-glass="on"] :is(.markdown,[data-markdown-text-style]) :is(.markdown,[data-markdown-text-style]) {
+ background: transparent;
+ padding: 0;
+ box-shadow: none;
+}
+:root[data-wynn-glass="on"] .group\/agent-activity {
+ background: rgb(var(--wynn-rgb) / var(--wynn-activity-alpha));
+ border: 1px solid var(--wynn-outline);
+ border-radius: 16px;
+ padding: 12px;
+}
+/* Native activity labels use 40/60% text alpha, too faint over artwork.
+   Limit the contrast correction to their metadata; status colors stay native. */
+:root[data-wynn-glass="on"] .group\/agent-activity [class*="--agent-activity-summary-color"] {
+ --agent-activity-summary-color: rgb(var(--wynn-muted)) !important;
+}
+@layer utilities {
+ :root[data-wynn-glass="on"] .group\/agent-activity :is([class~="text-text/60"],[class~="text-text/40"]) {
+  color: rgb(var(--wynn-muted)) !important;
+ }
+}
+/* Native shimmer owns !important colors in the components layer. Supply its
+   supported local palette variables so the animation keeps readable ink. */
+:root[data-wynn-glass="on"] .group\/agent-activity [class*="_cadencedShimmer_"] {
+ --loading-shimmer-base: rgb(var(--wynn-muted));
+ --loading-shimmer-highlight: rgb(var(--wynn-ink));
+}
+
+/* Code, terminal and editor backgrounds/tokens remain native and solid. */
+:root[data-wynn-glass="on"] :is(pre,[data-codex-xterm],.monaco-editor,.cm-editor,.shiki) {
+ background-color: var(--app-color-background-surface,var(--color-surface,rgb(var(--wynn-rgb)))) !important;
+ backdrop-filter: none !important;
+ -webkit-backdrop-filter: none !important;
+}
+:root[data-wynn-glass="on"] [data-app-shell-right-panel] {background: rgb(var(--wynn-rgb) / .98)}
+:root[data-wynn-glass="on"] .heading-xl[data-feature="game-source"] {
+ background: rgb(var(--wynn-rgb) / .92);
+ border: 1px solid var(--wynn-outline);
+ border-radius: 18px;
+ padding: 8px 16px;
+}
+:root[data-wynn-glass="on"] button[class*="_ComposerFooterDropdown_"] {
+ background-color: rgb(var(--wynn-rgb) / .78);
+ border-color: var(--wynn-outline);
+ transition: background-color 160ms ease;
+}
+:root[data-wynn-glass="on"] button[class*="_ComposerFooterDropdown_"]:not(:disabled):hover {background-color: rgb(var(--wynn-rgb) / .96)}
+/* These rules follow all palette overrides, including dark mode. */
+@media (prefers-reduced-motion:reduce) {
+ :root[data-wynn-glass="on"] :is(button,[data-composer-surface-variant]) {transition: none !important}
+}
+@media (prefers-reduced-transparency:reduce) {
+ :root[data-wynn-glass="on"][data-theme] {
+  --wynn-main-alpha: 1; --wynn-sidebar-alpha: 1; --wynn-floating-alpha: 1;
+  --wynn-message-alpha: 1; --wynn-activity-alpha: 1; --wynn-focus-alpha: 1;
+  --wynn-effective-blur: 0px;
+ }
+ :root[data-wynn-glass="on"] :is([data-composer-surface-variant],[role="menu"],[role="dialog"],[role="tooltip"],[data-radix-popper-content-wrapper]>div) {
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+ }
+}
+@supports not (backdrop-filter:blur(1px)) {
+ :root[data-wynn-glass="on"][data-theme] {--wynn-floating-alpha: 1; --wynn-focus-alpha: 1}
+}
